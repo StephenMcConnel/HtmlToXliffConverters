@@ -7,4 +7,5 @@ The implementation may be incomplete, but works for a wide range of HTML files. 
 translatable attribute values such as the alt attribute of the img element.  Another advantange is that it does not require any
 tagging or preprocessing of the HTML file.
 
-The programs currently have a very minimal command line interface to the world.
+The programs currently have a very minimal command line interface to the world.  It has been compiled, and the unit tests run, on Windows with Visual Studio 2015 Community Edition and with Mono 4.6 on Linux.  Other versions on Visual Studio and Mono may work as well.  NuGet is used to fetch a couple of libraries (NUnit 2.6.4 and HtmlAgilityPack 1.4.9.5).
+

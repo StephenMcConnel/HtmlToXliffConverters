@@ -1,0 +1,40 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<PropertyGroup>
+		<RootDir Condition="'$(teamcity_version)' == '' Or '$(OS)'!='Windows_NT'">$(MSBuildProjectDirectory)\..</RootDir>
+		<RootDir Condition="'$(teamcity_version)' != '' And '$(OS)'=='Windows_NT'">$(teamcity_build_checkoutDir)</RootDir>
+		<Solution>HtmlToXliffConverters.sln</Solution>
+		<Configuration>Release</Configuration>
+		<teamcity_agent_home_dir Condition="'$(teamcity_agent_home_dir)'=='' And '$(OS)'!='Windows_NT'">/var/lib/TeamCity/agent</teamcity_agent_home_dir>
+	</PropertyGroup>
+
+	<UsingTask TaskName="NUnitTeamCity"
+		AssemblyFile="$(teamcity_dotnet_nunitlauncher_msbuild_task)"
+		Condition=" '$(teamcity_version)' != '' And '$(OS)'=='Windows_NT'"/>
+	<UsingTask TaskName="NUnitTeamCity"
+		AssemblyFile="$(agent_home_dir)/plugins/dotnetPlugin/bin/JetBrains.BuildServer.MSBuildLoggers.dll"
+		Condition=" '$(teamcity_version)' != '' And '$(OS)'!='Windows_NT'"/>
+
+	<Import Project="NuGet.targets"/>
+
+	<Target Name="Build" DependsOnTargets="RestorePackages">
+		<MSBuild Projects="$(RootDir)/$(Solution)"
+			Targets="Rebuild"
+			Properties="Configuration=$(Configuration)" />
+	</Target>
+
+	<Target Name="Test" DependsOnTargets="Build">
+		<CallTarget Targets="TestOnly"/>
+	</Target>
+
+	<Target Name="TestOnly">
+		<ItemGroup>
+			<TestAssemblies Include="$(RootDir)/output/$(Configuration)/HtmlToXliffTests.dll"/>
+		</ItemGroup>
+
+		<NUnitTeamCity
+			Assemblies="@(TestAssemblies)"
+			ExcludeCategory="SkipOnTeamCity"
+			NUnitVersion="NUnit-2.6.3" />
+	</Target>
+
+</Project>
